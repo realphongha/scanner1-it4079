@@ -104,7 +104,7 @@ Token *readNumber(void) {
         readChar();
     }
 
-    if (countDot < 2){
+    if (countDot == 1){
         for (int i = 0; i < count; i++){
             if (charCodes[token->string[i]] != CHAR_PERIOD){
                 if (dotFlag){
@@ -116,6 +116,8 @@ Token *readNumber(void) {
                 dotFlag = 1;
             }
         }
+    } else if (countDot == 0) {
+        ;
     } else {
         token->tokenType = TK_NONE;
         error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
