@@ -1,0 +1,12 @@
+Program Example5; (* Factorial *)
+   
+Var a : Integer;
+    b : Integer;
+    c : Real;
+
+Begin
+    a = 0030;
+    c = 005.570043;
+    b = 52343243432410701;
+  
+End. (* Factorial *)

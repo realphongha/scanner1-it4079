@@ -1,4 +1,4 @@
-Program Example2; (* Double *)
+Program Example4; (* Double *)
    
 Var n : Real;
 
@@ -8,5 +8,5 @@ Function F(n : Real) : Real;
   End;
 
 Begin
-  Call WriteI( F(0000000000000003.14));
+  Call WriteI( F(0000000003.14));
 End. (* Double *)

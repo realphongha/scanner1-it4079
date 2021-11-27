@@ -106,26 +106,110 @@ Token *readIdentKeyword(void)
     return token;
 }
 
-Token *readNumber(void)
-{
-    Token *token = makeToken(TK_INTEGER, lineNo, colNo);
-    int count = 0;
-    int countDot = 0;
-    char intPart[MAX_IDENT_LEN + 1];
-    char decimalPart[MAX_IDENT_LEN + 1];
-    int countInt = 0;
-    int countDecimal = 0;
-    int dotFlag = 0;
-    int atStart = 1;
+// Token *readNumber(void)
+// {
+//     Token *token = makeToken(TK_INTEGER, lineNo, colNo);
+//     int count = 0;
+//     int countDot = 0;
+//     char intPart[MAX_IDENT_LEN + 1];
+//     char decimalPart[MAX_IDENT_LEN + 1];
+//     int countInt = 0;
+//     int countDecimal = 0;
+//     int dotFlag = 0;
+//     int atStart = 1;
 
-    while ((currentChar != EOF) && (charCodes[currentChar] == CHAR_DIGIT || charCodes[currentChar] == CHAR_PERIOD))
-    {
-        if (count + 1 >= MAX_IDENT_LEN)
-        {
-            token->tokenType = TK_NONE;
-            error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
-            return token;
-        }
+//     while ((currentChar != EOF) && (charCodes[currentChar] == CHAR_DIGIT || charCodes[currentChar] == CHAR_PERIOD))
+//     {
+//         if (count + 1 >= MAX_IDENT_LEN)
+//         {
+//             token->tokenType = TK_NONE;
+//             error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
+//             return token;
+//         }
+//         if (atStart && currentChar == '0')
+//         {
+//             readChar();
+//             continue;
+//         }
+//         atStart = 0;
+//         token->string[count++] = (char)currentChar;
+//         if (charCodes[currentChar] == CHAR_PERIOD)
+//         {
+//             countDot++;
+//         }
+//         readChar();
+//     }
+
+//     if (countDot == 1)
+//     {
+//         for (int i = 0; i < count; i++)
+//         {
+//             if (charCodes[token->string[i]] != CHAR_PERIOD)
+//             {
+//                 if (dotFlag)
+//                 {
+//                     decimalPart[countDecimal++] = token->string[i];
+//                 }
+//                 else
+//                 {
+//                     intPart[countInt++] = token->string[i];
+//                 }
+//             }
+//             else
+//             {
+//                 dotFlag = 1;
+//             }
+//         }
+//     }
+//     else if (countDot == 0)
+//     {
+//         ;
+//     }
+//     else
+//     {
+//         token->tokenType = TK_NONE;
+//         error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
+//         return token;
+//     }
+
+//     token->string[count] = '\0';
+//     intPart[countInt] = '\0';
+//     decimalPart[countDecimal] = '\0';
+
+//     if (countInt > 10 || countDecimal > 10)
+//     {
+//         token->tokenType = TK_NONE;
+//         error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
+//         return token;
+//     }
+//     else if ((countInt == 10 && strcmp(intPart, "2147483647") == 1) || (countDecimal == 10 && strcmp(decimalPart, "2147483647") == 1))
+//     {
+//         token->tokenType = TK_NONE;
+//         error(ERR_IDENTTOOLONG, token->lineNo, token->colNo);
+//         return token;
+//     }
+//     else
+//     {
+//         if (dotFlag)
+//         {
+//             token->tokenType = TK_REAL;
+//             token->value.rInt = atoi(intPart);
+//             token->value.rDec = atoi(decimalPart);
+//         }
+//         else
+//         {
+//             token->value.rInt = atoi(token->string);
+//         }
+//     }
+//     return token;
+// }
+Token *readNumber(void){
+    Token *token = makeToken(TK_NUMBER, lineNo, colNo);
+    int count =0;
+    int count_dot=0;
+    int atStart=1;
+
+    while((currentChar != EOF) && (charCodes[currentChar] == CHAR_DIGIT || charCodes[currentChar] == CHAR_PERIOD)){
         if (atStart && currentChar == '0')
         {
             readChar();
@@ -133,75 +217,34 @@ Token *readNumber(void)
         }
         atStart = 0;
         token->string[count++] = (char)currentChar;
-        if (charCodes[currentChar] == CHAR_PERIOD)
-        {
-            countDot++;
+        if(charCodes[currentChar] == CHAR_PERIOD){
+            count_dot++;
         }
         readChar();
     }
-
-    if (countDot == 1)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (charCodes[token->string[i]] != CHAR_PERIOD)
-            {
-                if (dotFlag)
-                {
-                    decimalPart[countDecimal++] = token->string[i];
-                }
-                else
-                {
-                    intPart[countInt++] = token->string[i];
-                }
-            }
-            else
-            {
-                dotFlag = 1;
+    if(count_dot<2 && count <= MAX_IDENT_LEN){
+        token->string[count] = '\0';
+        if(count_dot == 1){
+            token->value.n_real = atof(token->string);
+            return token;
+        }else if (count_dot == 0){
+            if (count > 10 || (count == 10 && strcmp(token->string,"2147483647") == 1)){
+                error(ERR_NUMBERTOOBIG, token->lineNo, token->colNo);
+                return token;
+            }else{
+                token->value.n_int = atoi(token->string);
+                return token;
             }
         }
-    }
-    else if (countDot == 0)
-    {
-        ;
-    }
-    else
-    {
-        token->tokenType = TK_NONE;
-        error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
-        return token;
-    }
-
-    token->string[count] = '\0';
-    intPart[countInt] = '\0';
-    decimalPart[countDecimal] = '\0';
-
-    if (countInt > 10 || countDecimal > 10)
-    {
-        token->tokenType = TK_NONE;
-        error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
-        return token;
-    }
-    else if ((countInt == 10 && strcmp(intPart, "2147483647") == 1) || (countDecimal == 10 && strcmp(decimalPart, "2147483647") == 1))
-    {
-        token->tokenType = TK_NONE;
-        error(ERR_IDENTTOOLONG, token->lineNo, token->colNo);
-        return token;
-    }
-    else
-    {
-        if (dotFlag)
-        {
-            token->tokenType = TK_REAL;
-            token->value.rInt = atoi(intPart);
-            token->value.rDec = atoi(decimalPart);
-        }
-        else
-        {
-            token->value.rInt = atoi(token->string);
+    }else{
+        if(count_dot>=2){
+            error(ERR_INVALIDNUMBER, token->lineNo, token->colNo);
+            return token;
+        }else if(count > MAX_IDENT_LEN){
+            error(ERR_NUMBERTOOBIG, token->lineNo, token->colNo);
+            return token;
         }
     }
-    return token;
 }
 
 Token *readConstChar(void)
@@ -407,6 +450,9 @@ void printToken(Token *token)
     case TK_IDENT:
         printf("TK_IDENT(%s)\n", token->string);
         break;
+    case TK_NUMBER:
+        printf("TK_NUMBER(%s)\n", token->string);
+        break;
     case TK_INTEGER:
         printf("TK_INTEGER(%s)\n", token->string);
         break;
@@ -588,8 +634,10 @@ int main()
     char *file4 = "test/real.kpl";
     char *file5 = "test/tooLong.kpl";
     char *file6 = "test/commentManyLine.kpl";
+    char *file7 = "test/example4.kpl";
+    char *file8 = "test/example5.kpl";
 
-    char *file = file6;
+    char *file = file8;
     printf("%s\n", file);
     if (scan(file) == IO_ERROR)
     {

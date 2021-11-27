@@ -25,6 +25,9 @@ void error(ErrorCode err, int lineNo, int colNo) {
     case ERR_INVALIDNUMBER:
         printf("%d-%d:%s\n", lineNo, colNo, ERM_INVALIDNUMBER);
         break;
+    case ERR_NUMBERTOOBIG:
+        printf("%d-%d:%s\n", lineNo, colNo, ERM_NUMBERTOOBIG);
+        break;
     }
     exit(-1);
 }
