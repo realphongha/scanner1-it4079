@@ -205,7 +205,7 @@ Token *readIdentKeyword(void)
 //     return token;
 // }
 Token *readNumber(void){
-    Token *token = makeToken(TK_NUMBER, lineNo, colNo);
+    Token *token = makeToken(TK_INTEGER, lineNo, colNo);
     int count =0;
     int count_dot=0;
     int atStart=1;
@@ -226,6 +226,7 @@ Token *readNumber(void){
     if(count_dot<2 && count <= MAX_IDENT_LEN){
         token->string[count] = '\0';
         if(count_dot == 1){
+            token->tokenType = TK_REAL;
             token->value.n_real = atof(token->string);
             return token;
         }else if (count_dot == 0){
@@ -648,7 +649,7 @@ int main()
     char *file8 = "test/example5.kpl";
     char *file9 = "test/skipLineComment.kpl";
 
-    char *file = file9;
+    char *file = file8;
     printf("%s\n", file);
     if (scan(file) == IO_ERROR)
     {
