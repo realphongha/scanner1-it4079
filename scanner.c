@@ -51,6 +51,7 @@ void skipComment()
         error(ERR_ENDOFCOMMENT, lineNo, colNo);
 }
 
+
 void skipCommentBeginSlash() {
   int state = 0;
   while ((currentChar != EOF) && (state < 2))
@@ -326,6 +327,15 @@ Token *getToken(void)
                 readChar();
                 skipCommentBeginSlash();
                 return getToken();
+
+            case CHAR_SLASH:
+                readChar();
+                while ((currentChar != EOF) && ((currentChar != '\n')))
+                {
+                    readChar();
+                }
+                return getToken();
+                
             default:
                 return makeToken(SB_SLASH, ln, cn);
         }
@@ -636,8 +646,9 @@ int main()
     char *file6 = "test/commentManyLine.kpl";
     char *file7 = "test/example4.kpl";
     char *file8 = "test/example5.kpl";
+    char *file9 = "test/skipLineComment.kpl";
 
-    char *file = file8;
+    char *file = file9;
     printf("%s\n", file);
     if (scan(file) == IO_ERROR)
     {
