@@ -217,6 +217,12 @@ Token *readNumber(void){
             continue;
         }
         atStart = 0;
+        if (count + 1 >= MAX_IDENT_LEN)
+        {
+            token->tokenType = TK_NONE;
+            error(ERR_NUMBERTOOBIG, token->lineNo, token->colNo);
+            return token;
+        }
         token->string[count++] = (char)currentChar;
         if(charCodes[currentChar] == CHAR_PERIOD){
             count_dot++;
@@ -649,7 +655,7 @@ int main()
     char *file8 = "test/example5.kpl";
     char *file9 = "test/skipLineComment.kpl";
 
-    char *file = file8;
+    char *file = file5;
     printf("%s\n", file);
     if (scan(file) == IO_ERROR)
     {
